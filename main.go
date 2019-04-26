@@ -6,17 +6,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"path/filepath"
 	"strings"
 )
 
 func main() {
 	dir := flag.String("d", "./proto", "Input folder")
-	aiasfile := flag.String("i", "aias.go", "out file name")
+	aiasfile := flag.String("o", "aias.go", "out file name")
 	flag.Parse()
 	readGPRCJSON(*dir, *aiasfile)
 }
 
 func readGPRCJSON(dir, aiasfile string) {
+	_, fileName := filepath.Split(dir)
+
 	jfiles := []string{}
 	protoName := ""
 	files, err := ioutil.ReadDir(dir)
@@ -86,7 +89,7 @@ func readGPRCJSON(dir, aiasfile string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := `package proto
+	s := `package ` + fileName + `
 
 // AiasJSON --
 var AiasJSON =` + "`" + string(retbuf) + "`"
