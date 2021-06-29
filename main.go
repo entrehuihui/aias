@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	dir := flag.String("d", "./proto", "Input folder")
+	dir := flag.String("d", "./", "Input folder")
 	aiasfile := flag.String("o", "aias.go", "out file name")
 	flag.Parse()
 	readGPRCJSON(*dir, *aiasfile)
@@ -21,7 +21,7 @@ func readGPRCJSON(dir, aiasfile string) {
 	_, fileName := filepath.Split(dir)
 
 	jfiles := []string{}
-	protoName := ""
+	protoName := "*.json"
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
@@ -35,17 +35,13 @@ func readGPRCJSON(dir, aiasfile string) {
 			continue
 		}
 		jfiles = append(jfiles, dir+"/"+fi.Name())
-		ok = strings.HasSuffix(fi.Name(), ".json")
-		if ok {
-			protoName = protoName + "/" + fi.Name()
-		}
 	}
-	retmap := make(map[string]interface{}, 0)
+	retmap := make(map[string]interface{})
 	ifmap := true
-	pathsmap := make(map[string]interface{}, 0)
-	definitionsmap := make(map[string]interface{}, 0)
+	pathsmap := make(map[string]interface{})
+	definitionsmap := make(map[string]interface{})
 	for _, jfile := range jfiles {
-		jmap := make(map[string]interface{}, 0)
+		jmap := make(map[string]interface{})
 		buf, err := ioutil.ReadFile(jfile)
 		if err != nil {
 			continue
@@ -64,19 +60,30 @@ func readGPRCJSON(dir, aiasfile string) {
 				v["title"] = protoName
 			}
 		}
-
-		v, ok := jmap["paths"].(map[string]interface{})
+		paths, ok := jmap["paths"].(map[string]interface{})
 		if ok {
-			// fmt.Println(v["/GetCommodityLists"])
-			for k, v1 := range v {
-				pathsmap[k] = v1
+			for k1, v1 := range paths {
+				method, ok := v1.(map[string]interface{})
+				if ok {
+					for _, v2 := range method {
+						value, ok := v2.(map[string]interface{})
+						if ok {
+							value["security"] = []interface{}{
+								map[string][]interface{}{
+									"authorization": make([]interface{}, 0),
+								},
+							}
+						}
+					}
+				}
+				pathsmap[k1] = v1
 			}
 		}
 
-		v, ok = jmap["definitions"].(map[string]interface{})
+		definitions, ok := jmap["definitions"].(map[string]interface{})
 		if ok {
 			// fmt.Println(v["/GetCommodityLists"])
-			for k, v1 := range v {
+			for k, v1 := range definitions {
 				definitionsmap[k] = v1
 			}
 		}
@@ -84,6 +91,17 @@ func readGPRCJSON(dir, aiasfile string) {
 
 	retmap["paths"] = pathsmap
 	retmap["definitions"] = definitionsmap
+	// 添加http/https选择
+	retmap["schemes"] = []string{"https",
+		"http"}
+	// 验证密钥
+	retmap["securityDefinitions"] = map[string]interface{}{
+		"authorization": map[string]string{
+			"type": "apiKey",
+			"name": "authorization",
+			"in":   "header",
+		},
+	}
 	// fmt.Println(retmap)
 	retbuf, err := json.Marshal(retmap)
 	if err != nil {

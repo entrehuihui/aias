@@ -1,0 +1,316 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sms.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/sms": {
+      "get": {
+        "summary": "短信记录",
+        "operationId": "SmsService_SmsGet",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoSmsGetResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "description": "获取量.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "description": "偏移量.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "fuzzy",
+            "description": "模糊检索.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "description": "状态 1发送中 2 发送成功 3发送失败.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "SmsService"
+        ]
+      },
+      "post": {
+        "summary": "发送短信",
+        "operationId": "SmsService_SmsPost",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoSmsPostResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoSmsPostReq"
+            }
+          }
+        ],
+        "tags": [
+          "SmsService"
+        ]
+      }
+    },
+    "/v1/sms/count": {
+      "get": {
+        "summary": "短信记录统计",
+        "operationId": "SmsService_SmsCountGet",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoSmsCountGetResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "SmsService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protoSms": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "ID"
+        },
+        "appname": {
+          "type": "string",
+          "title": "应用名称"
+        },
+        "createtime": {
+          "type": "string",
+          "format": "int64",
+          "title": "注册时间"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "title": "结果 1发送中 2发送成功 3发送失败"
+        },
+        "phone": {
+          "type": "string",
+          "title": "短信接收手机"
+        },
+        "Data": {
+          "type": "string",
+          "title": "短信内容"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "消耗短信条数"
+        },
+        "serid": {
+          "type": "integer",
+          "format": "int32",
+          "title": "短信服务ID"
+        },
+        "code": {
+          "type": "string",
+          "title": "模板ID"
+        }
+      },
+      "title": "Sms .记录"
+    },
+    "protoSmsCountGetResp": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "错误码"
+        },
+        "message": {
+          "type": "string",
+          "title": "错误信息"
+        },
+        "data": {
+          "$ref": "#/definitions/protosmscountinfo"
+        }
+      }
+    },
+    "protoSmsGetResp": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "错误码"
+        },
+        "message": {
+          "type": "string",
+          "title": "错误信息"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoSms"
+          },
+          "title": "用户信息"
+        },
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "title": "总数量"
+        }
+      },
+      "title": "SmsGetResp 权限记录返回"
+    },
+    "protoSmsPostReq": {
+      "type": "object",
+      "properties": {
+        "secretkey": {
+          "type": "string",
+          "title": "应用密钥"
+        },
+        "phone": {
+          "type": "string",
+          "title": "短信接收手机"
+        },
+        "data": {
+          "type": "string",
+          "title": "短信内容"
+        },
+        "code": {
+          "type": "string",
+          "title": "模板ID"
+        }
+      }
+    },
+    "protoSmsPostResp": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "错误码"
+        },
+        "message": {
+          "type": "string",
+          "title": "错误信息"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "protosmscountinfo": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "integer",
+          "format": "int32",
+          "title": "全部"
+        },
+        "success": {
+          "type": "integer",
+          "format": "int32",
+          "title": "成功"
+        },
+        "fail": {
+          "type": "integer",
+          "format": "int32",
+          "title": "失败"
+        },
+        "Count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "消耗短信条数"
+        },
+        "ing": {
+          "type": "integer",
+          "format": "int32",
+          "title": "发送中"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}
