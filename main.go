@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 	"test/swagger"
@@ -21,6 +22,10 @@ func main() {
 
 // 复制文件
 func getFileName() {
+	err := delFileDir()
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println("创建swagger-ui文件")
 	fileNameList := swagger.AssetNames()
 	for _, v := range fileNameList {
@@ -36,6 +41,16 @@ func saveFile(filename string) error {
 		return err
 	}
 	err = ioutil.WriteFile(filename, data, 0666)
+	return err
+}
+
+func delFileDir() error {
+	dir := "swagger"
+	err := os.RemoveAll(dir)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(dir, 0777)
 	return err
 }
 
