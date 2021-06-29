@@ -16,7 +16,6 @@ func main() {
 	aiasfile := flag.String("o", "aias.go", "out file name")
 	flag.Parse()
 	readGPRCJSON(*dir, *aiasfile)
-
 	getFileName()
 }
 
