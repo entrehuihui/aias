@@ -8,13 +8,36 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
+	"test/swagger"
 )
 
 func main() {
-	dir := flag.String("d", "./", "Input folder")
+	dir := flag.String("d", "./proto", "Input folder")
 	aiasfile := flag.String("o", "aias.go", "out file name")
 	flag.Parse()
 	readGPRCJSON(*dir, *aiasfile)
+
+	getFileName()
+}
+
+// 复制文件
+func getFileName() {
+	fmt.Println("创建swagger-ui文件")
+	fileNameList := swagger.AssetNames()
+	for _, v := range fileNameList {
+		err := saveFile(v)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+}
+func saveFile(filename string) error {
+	data, err := swagger.Asset(filename)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(filename, data, 0666)
+	return err
 }
 
 func readGPRCJSON(dir, aiasfile string) {
