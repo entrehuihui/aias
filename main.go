@@ -9,7 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"test/swagger"
+
+	"github.com/entrehuihui/aias/swagger"
 )
 
 func main() {
